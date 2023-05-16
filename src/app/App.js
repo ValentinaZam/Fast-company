@@ -12,7 +12,7 @@ function App() {
         <div>
             <NavBar />
             <Switch>
-                <Route path="/users/:userId?/edit" component={UserEdit} />
+                <Route path="/users/:userId/edit" component={UserEdit} />
                 <Route path="/users/:userId?" component={Users} />
                 <Route path="/login/:type?" component={Login} />
                 <Route path="/" exact component={Main} />

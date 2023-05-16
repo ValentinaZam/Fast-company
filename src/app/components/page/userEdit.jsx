@@ -1,7 +1,88 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import TextField from "../common/form/textField"
+import api from "../../../api"
+import SelectField from "../common/form/selectField"
+import RadioField from "../common/form/radioField"
+import MultiSelectField from "../common/form/multiSelectField"
 
 const UserEdit = () => {
-    return (<h1>Ghb</h1>)
+    const { userId } = useParams()
+    const [professions, setProfession] = useState()
+    const [qualities, setQualities] = useState({})
+    const [user, setUser] = useState({})
+
+    useEffect(() => {
+        api.professions.fetchAll().then((data) => setProfession(data))
+        api.qualities.fetchAll().then((data) => setQualities(data))
+        api.users.getById(userId).then((data) => setUser(data))
+    }, [])
+
+    const handleChange = (target) => {
+        console.log(target)
+        setUser((prevState) => ({ ...prevState, [target.name]: target.value }))
+    }
+
+    const Quality = (data) => {
+        const arrayQuality = []
+        data.map((item) => arrayQuality.push({ label: item.name, value: item._id }))
+        return arrayQuality
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        api.users.update(userId, user).then((data) => setUser(data))
+        setUser(e.target.value)
+    }
+    if (user.profession) {
+        return (
+            <div className="container mt-5">
+                <div className="row">
+                    <div className="col-md-6 offset-md-3 shadow p-4">
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                                label="Имя"
+                                type="text"
+                                name="name"
+                                value={user.name}
+                                onChange={handleChange} />
+                            <TextField
+                                label="Электронная почта"
+                                type="email"
+                                name="email"
+                                value={user.email}
+                                onChange={handleChange} />
+                            <SelectField label="Выбери свою профессию"
+                                defaultOption="Choose..."
+                                name="profession"
+                                options={professions}
+                                onChange={handleChange}
+                                value={user.profession.name} />
+                            <RadioField options={[
+                                { name: "Male", value: "male" },
+                                { name: "Female", value: "female" },
+                                { name: "Other", value: "other" }
+                            ]}
+                                value={user.sex}
+                                name="sex"
+                                onChange={handleChange}
+                                label="Выберете ваш пол"
+                            />
+                            <MultiSelectField
+                                options={qualities}
+                                onChange={handleChange}
+                                name="qualities"
+                                label="Выберете ваши качества"
+                                defaultValue={Quality(user.qualities)} />
+                            <button type="submit" className="btn btn-primary w-100 mx-auto">Обновить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        )
+    } else {
+        return <h1>Loading</h1>
+    }
 }
 
 export default UserEdit
