@@ -21,10 +21,20 @@ const UserEdit = () => {
     }, [])
 
     const handleChange = (target) => {
-        // console.log(target)
         setUser((prevState) => ({ ...prevState, [target.name]: target.value }))
         test[target.name] = target.value
-        // console.log(test)
+    }
+
+    const CheckQuality = (qual) => {
+        const newQualities = []
+        if (qual[0].value) {
+            qual.forEach((item) => {
+                const qualCheck = Object.values(qualities).find((i) => { return i._id === item.value })
+                newQualities.push(qualCheck)
+            })
+            return newQualities
+        }
+        return qual
     }
 
     const CheckProfession = (prof) => {
@@ -37,17 +47,16 @@ const UserEdit = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log(test)
-        // profession: professions.filter((item) => { return item._ === test.profession.value }),
+        // console.log(test)
         const updatedUser = {
             name: test.name,
             email: test.email,
             profession: CheckProfession(test.profession),
             sex: test.sex,
-            qualities: test.qualities
+            qualities: CheckQuality(test.qualities)
             // qualities: test.qualities.map((quality) => ({ name: quality.label, color: quality.color, _id: quality.value }))
         }
-        console.log(updatedUser)
+        // console.log(updatedUser)
         // Изменить вид данных который приходит в user. Как?
         api.users.update(userId, updatedUser).then(() => { history.push(`/users/${userId}`) })
     }
