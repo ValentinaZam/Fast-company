@@ -12,7 +12,6 @@ const UserEdit = () => {
     const [qualities, setQualities] = useState({})
     const [user, setUser] = useState({})
     const history = useHistory()
-    const test = user
 
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data))
@@ -22,7 +21,7 @@ const UserEdit = () => {
 
     const handleChange = (target) => {
         setUser((prevState) => ({ ...prevState, [target.name]: target.value }))
-        test[target.name] = target.value
+        user[target.name] = target.value
     }
 
     const CheckQuality = (qual) => {
@@ -47,20 +46,16 @@ const UserEdit = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // console.log(test)
         const updatedUser = {
-            name: test.name,
-            email: test.email,
-            profession: CheckProfession(test.profession),
-            sex: test.sex,
-            qualities: CheckQuality(test.qualities)
-            // qualities: test.qualities.map((quality) => ({ name: quality.label, color: quality.color, _id: quality.value }))
+            name: user.name,
+            email: user.email,
+            profession: CheckProfession(user.profession),
+            sex: user.sex,
+            qualities: CheckQuality(user.qualities)
         }
-        // console.log(updatedUser)
-        // Изменить вид данных который приходит в user. Как?
         api.users.update(userId, updatedUser).then(() => { history.push(`/users/${userId}`) })
     }
-    if (user.profession && user.qualities) {
+    if (user.profession) {
         return (
             <div className="container mt-5">
                 <div className="row">
@@ -83,7 +78,7 @@ const UserEdit = () => {
                                 name="profession"
                                 options={professions}
                                 onChange={handleChange}
-                                value={test.profession.name} />
+                                value={user.profession.name} />
                             <RadioField options={[
                                 { name: "Male", value: "male" },
                                 { name: "Female", value: "female" },
