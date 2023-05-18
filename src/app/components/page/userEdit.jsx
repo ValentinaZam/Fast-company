@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useHistory } from "react-router-dom"
 import TextField from "../common/form/textField"
 import api from "../../../api"
 import SelectField from "../common/form/selectField"
@@ -11,6 +11,8 @@ const UserEdit = () => {
     const [professions, setProfession] = useState()
     const [qualities, setQualities] = useState({})
     const [user, setUser] = useState({})
+    const history = useHistory()
+    const test = user
 
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data))
@@ -19,22 +21,37 @@ const UserEdit = () => {
     }, [])
 
     const handleChange = (target) => {
-        console.log(target)
+        // console.log(target)
         setUser((prevState) => ({ ...prevState, [target.name]: target.value }))
+        test[target.name] = target.value
+        // console.log(test)
     }
 
-    const Quality = (data) => {
-        const arrayQuality = []
-        data.map((item) => arrayQuality.push({ label: item.name, value: item._id }))
-        return arrayQuality
+    const CheckProfession = (prof) => {
+        if (typeof prof === "string") {
+            const userProfession = professions.find((item) => { return item.name === prof })
+            return userProfession
+        }
+        return prof
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        api.users.update(userId, user).then((data) => setUser(data))
-        setUser(e.target.value)
+        console.log(test)
+        // profession: professions.filter((item) => { return item._ === test.profession.value }),
+        const updatedUser = {
+            name: test.name,
+            email: test.email,
+            profession: CheckProfession(test.profession),
+            sex: test.sex,
+            qualities: test.qualities
+            // qualities: test.qualities.map((quality) => ({ name: quality.label, color: quality.color, _id: quality.value }))
+        }
+        console.log(updatedUser)
+        // Изменить вид данных который приходит в user. Как?
+        api.users.update(userId, updatedUser).then(() => { history.push(`/users/${userId}`) })
     }
-    if (user.profession) {
+    if (user.profession && user.qualities) {
         return (
             <div className="container mt-5">
                 <div className="row">
@@ -57,7 +74,7 @@ const UserEdit = () => {
                                 name="profession"
                                 options={professions}
                                 onChange={handleChange}
-                                value={user.profession.name} />
+                                value={test.profession.name} />
                             <RadioField options={[
                                 { name: "Male", value: "male" },
                                 { name: "Female", value: "female" },
@@ -73,7 +90,7 @@ const UserEdit = () => {
                                 onChange={handleChange}
                                 name="qualities"
                                 label="Выберете ваши качества"
-                                defaultValue={Quality(user.qualities)} />
+                                defaultValue={user.qualities.map((item) => ({ label: item.name, value: item._id }))} />
                             <button type="submit" className="btn btn-primary w-100 mx-auto">Обновить</button>
                         </form>
                     </div>

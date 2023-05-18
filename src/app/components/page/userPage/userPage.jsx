@@ -19,6 +19,7 @@ const UserPage = ({ userId }) => {
             <div>
                 <h1> {user.name}</h1>
                 <h2>Профессия: {user.profession.name}</h2>
+                {/* user.profession.name ? user.profession.name : user.profession */}
                 <Qualities qualities={user.qualities} />
                 <p>completedMeetings: {user.completedMeetings}</p>
                 <h2>Rate: {user.rate}</h2>
